@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   User, Bluetooth, Bell, Shield, Download, Trash2,
@@ -6,12 +7,15 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useDeviceStore } from '../store/deviceStore';
+import { useECGStore } from '../store/ecgStore';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 
 export const Settings: React.FC = () => {
   const { user, updateUser, logout } = useAuthStore();
+  const clearECG = useECGStore(state => state.clear);
+  const navigate = useNavigate();
   const {
     status: deviceStatus,
     mode: deviceMode,
@@ -351,7 +355,12 @@ export const Settings: React.FC = () => {
               <Button
                 variant="danger"
                 className="w-full justify-start"
-                onClick={logout}
+                onClick={async () => {
+                  await logout();
+                  clearECG();
+                  // navigate to login explicitly; ProtectedRoute will guard too
+                  navigate('/login');
+                }}
                 icon={LogOut}
               >
                 Sign Out

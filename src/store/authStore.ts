@@ -9,7 +9,7 @@ interface AuthState {
   currentRole: 'patient' | 'clinic';
   onboardingCompleted: boolean;
   login: (user: User, token: string) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
   switchRole: (role: 'patient' | 'clinic') => void;
   updateUser: (updates: Partial<User>) => void;
   completeOnboarding: () => void;
@@ -30,12 +30,23 @@ export const useAuthStore = create<AuthState>()(
         isAuthenticated: true, 
         currentRole: user.role === 'both' ? 'patient' : user.role 
       }),
-      logout: () => set({ 
-        user: null, 
-        token: null,
-        isAuthenticated: false, 
-        onboardingCompleted: false 
-      }),
+      logout: async () => {
+        // attempt server logout to clear cookie, but don't block if it fails
+        try {
+          await fetch('/api/auth/logout', { method: 'GET', credentials: 'include' });
+        } catch (err) {
+          console.error('Server logout failed', err);
+        }
+
+        // reset auth state
+        set({ 
+          user: null, 
+          token: null,
+          isAuthenticated: false, 
+          onboardingCompleted: false 
+        });
+
+      },
       switchRole: (role) => set({ currentRole: role }),
       updateUser: (updates) => {
         const currentUser = get().user;

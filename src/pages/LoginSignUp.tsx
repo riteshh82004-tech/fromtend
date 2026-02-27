@@ -38,6 +38,7 @@ const MobileVersion: React.FC<{ onBack?: () => void; onLoginSuccess?: (user: any
     name: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,6 +52,9 @@ const MobileVersion: React.FC<{ onBack?: () => void; onLoginSuccess?: (user: any
     e.preventDefault();
     try {
       if (isSignUp) {
+        if (formData.password !== formData.confirmPassword) {
+          throw new Error("Passwords do not match");
+        }
         const res = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -80,7 +84,7 @@ const MobileVersion: React.FC<{ onBack?: () => void; onLoginSuccess?: (user: any
               sleep: 8
             }
           }, data.token);
-          
+
           if (onLoginSuccess) {
             onLoginSuccess(data.user, data.token);
           } else {
@@ -116,7 +120,7 @@ const MobileVersion: React.FC<{ onBack?: () => void; onLoginSuccess?: (user: any
               sleep: 8
             }
           }, data.token);
-          
+
           if (onLoginSuccess) {
             onLoginSuccess(data.user, data.token);
           } else {
@@ -375,9 +379,9 @@ const MobileVersion: React.FC<{ onBack?: () => void; onLoginSuccess?: (user: any
                 />
                 <input
                   type="password"
-                  name="password"
-                  placeholder="Current Password"
-                  value={formData.password}
+                  name="confirmPassword"
+                  placeholder="Confirm Password"
+                  value={formData.confirmPassword}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-gray-600"
                 />
@@ -432,6 +436,7 @@ const DesktopVersion: React.FC<{ onBack?: () => void; onLoginSuccess?: (user: an
     name: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -445,6 +450,9 @@ const DesktopVersion: React.FC<{ onBack?: () => void; onLoginSuccess?: (user: an
     e.preventDefault();
     try {
       if (isSignUp) {
+        if (formData.password !== formData.confirmPassword) {
+          throw new Error("Passwords do not match");
+        }
         const res = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -474,7 +482,7 @@ const DesktopVersion: React.FC<{ onBack?: () => void; onLoginSuccess?: (user: an
               sleep: 8
             }
           }, data.token);
-          
+
           if (onLoginSuccess) {
             onLoginSuccess(data.user, data.token);
           } else {
@@ -510,7 +518,7 @@ const DesktopVersion: React.FC<{ onBack?: () => void; onLoginSuccess?: (user: an
               sleep: 8
             }
           }, data.token);
-          
+
           if (onLoginSuccess) {
             onLoginSuccess(data.user, data.token);
           } else {
@@ -671,9 +679,9 @@ const DesktopVersion: React.FC<{ onBack?: () => void; onLoginSuccess?: (user: an
               />
               <input
                 type="password"
-                name="password"
+                name="confirmPassword"
                 placeholder="Confirm Password"
-                value={formData.password}
+                value={formData.confirmPassword}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-gray-600"
               />

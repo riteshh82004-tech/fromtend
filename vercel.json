@@ -3,6 +3,10 @@
     {
       "source": "/api/(.*)",
       "destination": "https://backend-uyqm.onrender.com/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }

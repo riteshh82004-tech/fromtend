@@ -15,6 +15,7 @@ interface ECGStoreState {
   getPatientSessions: (patientId: string) => ECGSession[];
   calculateHeartRate: (samples: number[]) => number;
   calculateSignalQuality: (samples: number[]) => 'excellent' | 'good' | 'fair' | 'poor';
+  clear: () => void;
 }
 
 type PersistedECGSessions = Array<
@@ -168,7 +169,10 @@ export const useECGStore = create<ECGStoreState>()(
       },
 
       calculateHeartRate,
-      calculateSignalQuality
+      calculateSignalQuality,
+      clear: () => {
+        set({ sessions: [], currentSession: null, isRecording: false });
+      }
     }),
     {
       name: 'ecg-storage',
