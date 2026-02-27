@@ -97,7 +97,7 @@ export const AuthFlow: React.FC = () => {
     try {
       // Send complete profile data to backend
       const response = await fetch(
-        "http://localhost:5000/auth/complete-profile",
+        "/api/auth/complete-profile",
         {
           method: "POST",
           headers: {

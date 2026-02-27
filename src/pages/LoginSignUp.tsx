@@ -51,7 +51,7 @@ const MobileVersion: React.FC<{ onBack?: () => void; onLoginSuccess?: (user: any
     e.preventDefault();
     try {
       if (isSignUp) {
-        const res = await fetch("http://localhost:5000/auth/register", {
+        const res = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -88,7 +88,7 @@ const MobileVersion: React.FC<{ onBack?: () => void; onLoginSuccess?: (user: any
           }
         }
       } else {
-        const res = await fetch("http://localhost:5000/auth/login", {
+        const res = await fetch("/api/auth/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -135,7 +135,7 @@ const MobileVersion: React.FC<{ onBack?: () => void; onLoginSuccess?: (user: any
   };
 
   const handleGoogleSignIn = () => {
-    window.location.href = "http://localhost:5000/auth/google";
+    window.location.href = "/api/auth/google";
   };
 
   const handleDragEnd = (event: any, info: any) => {
@@ -444,7 +444,7 @@ const DesktopVersion: React.FC<{ onBack?: () => void; onLoginSuccess?: (user: an
     e.preventDefault();
     try {
       if (isSignUp) {
-        const res = await fetch("http://localhost:5000/auth/register", {
+        const res = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -481,7 +481,7 @@ const DesktopVersion: React.FC<{ onBack?: () => void; onLoginSuccess?: (user: an
           }
         }
       } else {
-        const res = await fetch("http://localhost:5000/auth/login", {
+        const res = await fetch("/api/auth/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -528,7 +528,7 @@ const DesktopVersion: React.FC<{ onBack?: () => void; onLoginSuccess?: (user: an
   };
 
   const handleGoogleSignIn = () => {
-    window.location.href = "http://localhost:5000/auth/google";
+    window.location.href = "/api/auth/google";
   };
 
   return (

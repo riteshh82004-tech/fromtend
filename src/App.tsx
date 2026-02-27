@@ -52,7 +52,7 @@ function AppContent() {
       const { setToken, login } = useAuthStore.getState();
       setToken(token);
       // Fetch user data
-      fetch('http://localhost:5000/auth/me', {
+      fetch('/api/auth/me', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
