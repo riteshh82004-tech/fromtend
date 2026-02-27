@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 
 interface IntroWaveformProps {
   color?: string;
@@ -12,7 +12,7 @@ export const IntroWaveform: React.FC<IntroWaveformProps> = ({
   height = 60,
   animated = true
 }) => {
-  const pathVariants = {
+  const pathVariants: Variants = {
     hidden: { pathLength: 0 },
     visible: { 
       pathLength: 1,

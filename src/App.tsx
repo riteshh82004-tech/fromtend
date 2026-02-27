@@ -154,7 +154,7 @@ function AppContent() {
     <div className="min-h-screen bg-gray-50">
       <AnimatePresence mode="wait">
         {!isAuthenticated ? (
-          <Routes>
+          <Routes location={location} key={location.pathname}>
             <Route path="/login" element={
               <PublicRoute>
                 <LoginSignupPage />
@@ -190,7 +190,7 @@ function AppContent() {
 
             {/* Main Content */}
             <main className={`flex-1 overflow-auto ${isMobile ? 'pb-20' : ''}`}>
-              <Routes>
+              <Routes location={location} key={location.pathname}>
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
                     <Dashboard />

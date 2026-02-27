@@ -17,6 +17,14 @@ interface ECGStoreState {
   calculateSignalQuality: (samples: number[]) => 'excellent' | 'good' | 'fair' | 'poor';
 }
 
+type PersistedECGSessions = Array<
+  Omit<ECGSession, 'startTime' | 'endTime'> & { startTime: string; endTime: string }
+>;
+
+type PersistedECGState = {
+  sessions?: PersistedECGSessions;
+};
+
 // Calculate average heart rate from ECG samples (simplified R-peak detection)
 const calculateHeartRate = (samples: number[]): number => {
   if (samples.length < 100) return 0;
@@ -107,13 +115,11 @@ export const useECGStore = create<ECGStoreState>()(
           signalQuality: calculateSignalQuality(state.currentSession.samples)
         };
 
-        set({
+        set((s: ECGStoreState) => ({
+          sessions: [...s.sessions, session],
           currentSession: null,
           isRecording: false
-        });
-
-        // Auto-save session
-        get().saveSession();
+        }));
       },
 
       addSamples: (samples: number[]) => {
@@ -148,8 +154,8 @@ export const useECGStore = create<ECGStoreState>()(
       },
 
       deleteSession: (sessionId: string) => {
-        set((state) => ({
-          sessions: state.sessions.filter(s => s.id !== sessionId)
+        set((state: ECGStoreState) => ({
+          sessions: state.sessions.filter((s: ECGSession) => s.id !== sessionId)
         }));
       },
 
@@ -166,18 +172,19 @@ export const useECGStore = create<ECGStoreState>()(
     }),
     {
       name: 'ecg-storage',
-      partialize: (state) => ({ 
-        sessions: state.sessions.map(s => ({
+      partialize: (state: ECGStoreState): PersistedECGState => ({
+        sessions: state.sessions.map((s: ECGSession) => ({
           ...s,
           startTime: s.startTime.toISOString(),
           endTime: s.endTime.toISOString()
         }))
       }),
-      merge: (persistedState: any, currentState: any) => {
-        if (persistedState?.sessions) {
+      merge: (persistedState: unknown, currentState: ECGStoreState): ECGStoreState => {
+        const persisted = persistedState as PersistedECGState | null;
+        if (persisted?.sessions && Array.isArray(persisted.sessions)) {
           return {
             ...currentState,
-            sessions: persistedState.sessions.map((s: any) => ({
+            sessions: persisted.sessions.map((s) => ({
               ...s,
               startTime: new Date(s.startTime),
               endTime: new Date(s.endTime)

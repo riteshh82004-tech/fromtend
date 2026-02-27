@@ -42,7 +42,7 @@ export const TestFlow: React.FC<TestFlowProps> = ({ onClose }) => {
   const [recording, setRecording] = useState(false);
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<{ value: number; status: 'normal' | 'warning' | 'danger' } | null>(null);
-  const [connectionMode, setConnectionMode] = useState<'usb' | 'bluetooth' | null>(null);
+  const [, setConnectionMode] = useState<'usb' | 'bluetooth' | null>(null);
 
   const tests = [
     { 

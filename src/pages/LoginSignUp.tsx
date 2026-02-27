@@ -139,6 +139,7 @@ const MobileVersion: React.FC<{ onBack?: () => void; onLoginSuccess?: (user: any
   };
 
   const handleDragEnd = (event: any, info: any) => {
+    void event;
     const threshold = 100;
 
     if (!isSignUp && info.offset.y < -threshold) {

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  User, Bluetooth, Wifi, Bell, Shield, Download, Trash2, 
-  Smartphone, HelpCircle, LogOut, Settings as SettingsIcon 
+  User, Bluetooth, Bell, Shield, Download, Trash2,
+  HelpCircle, LogOut, Settings as SettingsIcon, Usb, AlertCircle
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useDeviceStore } from '../store/deviceStore';
@@ -12,7 +12,14 @@ import { Input } from '../components/ui/Input';
 
 export const Settings: React.FC = () => {
   const { user, updateUser, logout } = useAuthStore();
-  const { devices, connectDevice, disconnectDevice, startScanning, stopScanning, isScanning } = useDeviceStore();
+  const {
+    status: deviceStatus,
+    mode: deviceMode,
+    connectUSB,
+    connectBluetooth,
+    disconnect,
+    error: deviceError,
+  } = useDeviceStore();
   const [activeSection, setActiveSection] = useState<'profile' | 'devices' | 'notifications' | 'privacy' | 'support'>('profile');
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
@@ -37,14 +44,6 @@ export const Settings: React.FC = () => {
   const handleSaveProfile = () => {
     if (user) {
       updateUser(profileData);
-    }
-  };
-
-  const handleDeviceToggle = (deviceId: string, connected: boolean) => {
-    if (connected) {
-      disconnectDevice(deviceId);
-    } else {
-      connectDevice(deviceId);
     }
   };
 
@@ -132,83 +131,54 @@ export const Settings: React.FC = () => {
     <div className="space-y-6">
       <Card>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">Connected Devices</h3>
-          <Button 
-            onClick={isScanning ? stopScanning : startScanning}
-            variant={isScanning ? "danger" : "outline"}
-            size="sm"
-          >
-            {isScanning ? 'Stop Scanning' : 'Scan for Devices'}
-          </Button>
+          <h3 className="text-lg font-semibold text-gray-800">ECG Device</h3>
+          <div className="text-sm text-gray-600">
+            Status: <span className="font-medium text-gray-800">{deviceStatus}</span>
+            {deviceMode ? <span className="ml-2 text-gray-500">({deviceMode.toUpperCase()})</span> : null}
+          </div>
         </div>
 
-        {isScanning && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-4"
-          >
-            <div className="flex items-center space-x-3">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full"
-              />
-              <span className="text-blue-800">Scanning for devices...</span>
+        {deviceError && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-4">
+            <div className="flex items-start space-x-3">
+              <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
+              <div className="flex-1">
+                <div className="text-sm font-medium text-red-800">Connection error</div>
+                <div className="text-sm text-red-700">{deviceError}</div>
+              </div>
             </div>
-          </motion.div>
+          </div>
         )}
 
-        <div className="space-y-4">
-          {devices.map((device) => (
-            <motion.div
-              key={device.id}
-              whileHover={{ scale: 1.01 }}
-              className={`
-                p-4 rounded-2xl border-2 transition-all duration-200
-                ${device.connected ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-white'}
-              `}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className={`
-                    w-12 h-12 rounded-2xl flex items-center justify-center
-                    ${device.connected ? 'bg-green-100' : 'bg-gray-100'}
-                  `}>
-                    {device.connectionType === 'bluetooth' && <Bluetooth className={`w-6 h-6 ${device.connected ? 'text-green-600' : 'text-gray-400'}`} />}
-                    {device.connectionType === 'wifi' && <Wifi className={`w-6 h-6 ${device.connected ? 'text-green-600' : 'text-gray-400'}`} />}
-                    {device.connectionType === 'usb' && <Smartphone className={`w-6 h-6 ${device.connected ? 'text-green-600' : 'text-gray-400'}`} />}
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-800">{device.name}</h4>
-                    <div className="flex items-center space-x-2 text-sm text-gray-600">
-                      <span className="capitalize">{device.type}</span>
-                      {device.batteryLevel && (
-                        <>
-                          <span>•</span>
-                          <span>{device.batteryLevel}% battery</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3">
-                  <div className={`
-                    w-3 h-3 rounded-full
-                    ${device.connected ? 'bg-green-500' : 'bg-gray-300'}
-                  `} />
-                  <Button
-                    variant={device.connected ? "danger" : "primary"}
-                    size="sm"
-                    onClick={() => handleDeviceToggle(device.id, device.connected)}
-                  >
-                    {device.connected ? 'Disconnect' : 'Connect'}
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Button
+            variant="outline"
+            icon={Usb}
+            disabled={deviceStatus === 'connecting' || deviceStatus === 'connected'}
+            onClick={() => {
+              void connectUSB();
+            }}
+          >
+            Connect via USB
+          </Button>
+          <Button
+            variant="outline"
+            icon={Bluetooth}
+            disabled={deviceStatus === 'connecting' || deviceStatus === 'connected'}
+            onClick={() => {
+              void connectBluetooth();
+            }}
+          >
+            Connect via Bluetooth
+          </Button>
+          <Button
+            className="md:col-span-2"
+            variant="danger"
+            disabled={deviceStatus !== 'connected'}
+            onClick={disconnect}
+          >
+            Disconnect
+          </Button>
         </div>
       </Card>
 

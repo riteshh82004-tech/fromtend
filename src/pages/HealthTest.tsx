@@ -12,7 +12,6 @@ import {
   Usb,
   Bluetooth,
   AlertCircle,
-  X,
 } from "lucide-react";
 import { usePatientStore } from "../store/patientStore";
 import { useAuthStore } from "../store/authStore";
@@ -88,7 +87,7 @@ export const HealthTest: React.FC = () => {
     value: number;
     status: "normal" | "warning" | "danger";
   } | null>(null);
-  const [connectionMode, setConnectionMode] = useState<
+  const [, setConnectionMode] = useState<
     "usb" | "bluetooth" | null
   >(null);
 

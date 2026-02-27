@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Activity, Droplet, Bluetooth, Wifi, Usb, Star, ShoppingCart, BookOpen, Play } from 'lucide-react';
+import { Heart, Bluetooth, Wifi, Usb, Star, ShoppingCart, BookOpen, Play } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 

@@ -75,7 +75,7 @@ export const AuthFlow: React.FC = () => {
   }, [isAuthenticated, user]);
 
   // Handle successful login/registration from LoginSignupPage
-  const handleLoginSuccess = (user: any, authToken: string) => {
+  const handleLoginSuccess = (user: any) => {
     // Pre-populate the register form with user data
     setFormData((prev) => ({
       ...prev,

@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Heart, BarChart3, User, Users } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { Waveform } from '../animations/Waveform';
-import { CardFlip } from '../animations/CardFlip';
 import { IntroWaveform } from '../animations/IntroWaveForm';
 
 interface OnboardingSlidesProps {
