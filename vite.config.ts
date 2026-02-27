@@ -7,9 +7,9 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://backend-uyqm.onrender.com/" , 
+        target: "https://backend-uyqm.onrender.com" , 
         changeOrigin: true,
-        secure: false,
+        secure: true,
       }
     }
   }
