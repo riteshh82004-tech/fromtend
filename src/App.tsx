@@ -199,8 +199,8 @@ function AppContent() {
             animate={{ opacity: 1 }}
             className="h-screen flex flex-col"
           >
-            {/* Desktop Header */}
-            {!isMobile && (
+            
+            {!isMobile && location.pathname !== '/complete-profile' && (
               <Header />
             )}
 
