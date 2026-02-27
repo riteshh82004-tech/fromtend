@@ -9,8 +9,13 @@ import { Card } from "../components/ui/Card";
 import LoginSignupPage from "./LoginSignUp";
 
 export const AuthFlow: React.FC = () => {
-  const { login, token, user, isAuthenticated } = useAuthStore();
+  const { login, token: storeToken, user, isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
+
+  // Use either the store token or extract from URL directly if it's a fresh redirect
+  const params = new URLSearchParams(window.location.search);
+  const urlToken = params.get('token');
+  const token = storeToken || urlToken;
 
   // Determine initial step based on authentication status
   const getInitialStep = ():
@@ -18,6 +23,11 @@ export const AuthFlow: React.FC = () => {
     | "register"
     | "role-select"
     | "login" => {
+    const params = new URLSearchParams(window.location.search);
+    const stepParam = params.get('step');
+    if (stepParam === 'register') return 'register';
+    if (stepParam === 'login') return 'login';
+    if (stepParam === 'role-select') return 'role-select';
     if (isAuthenticated && user) {
       // If user is authenticated but profile is incomplete, show register step
       if (!user.phone || !user.dateOfBirth) {
@@ -73,6 +83,21 @@ export const AuthFlow: React.FC = () => {
       }
     }
   }, [isAuthenticated, user]);
+
+  // Sync step from URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const stepParam = params.get('step');
+    if (stepParam === 'register') {
+      setStep('register');
+    } else if (stepParam === 'login') {
+      setStep('login');
+    } else if (stepParam === 'role-select') {
+      setStep('role-select');
+    } else if (isAuthenticated && (!user?.phone || !user?.dateOfBirth)) {
+      setStep('register');
+    }
+  }, [window.location.search, isAuthenticated, user]);
 
   // Handle successful login/registration from LoginSignupPage
   const handleLoginSuccess = (user: any) => {
@@ -292,10 +317,9 @@ export const AuthFlow: React.FC = () => {
                         }
                         className={`
                           px-4 py-2 rounded-xl font-medium transition-all duration-200 capitalize
-                          ${
-                            formData.gender === gender
-                              ? "bg-blue-600 text-white shadow-md"
-                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          ${formData.gender === gender
+                            ? "bg-blue-600 text-white shadow-md"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                           }
                         `}
                       >
@@ -453,10 +477,9 @@ export const AuthFlow: React.FC = () => {
                     onClick={() => setSelectedRole(role.id)}
                     className={`
                       w-full p-4 rounded-2xl border-2 transition-all duration-200 text-left
-                      ${
-                        isSelected
-                          ? "border-blue-600 bg-blue-50"
-                          : "border-gray-200 hover:border-gray-300 bg-white"
+                      ${isSelected
+                        ? "border-blue-600 bg-blue-50"
+                        : "border-gray-200 hover:border-gray-300 bg-white"
                       }
                     `}
                   >

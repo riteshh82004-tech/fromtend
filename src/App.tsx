@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from './store/authStore';
 import { Header } from './components/navigation/Header';
@@ -23,7 +23,9 @@ function AppContent() {
   const location = useLocation();
   const isMobile = useUiStore(state => state.isMobile);
   const setIsMobile = useUiStore(state => state.setIsMobile);
-  
+
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => {
@@ -43,6 +45,18 @@ function AppContent() {
 
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    const handleAuthRedirect = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail) {
+        navigate(customEvent.detail);
+      }
+    };
+
+    window.addEventListener('auth-redirect', handleAuthRedirect);
+    return () => window.removeEventListener('auth-redirect', handleAuthRedirect);
+  }, [navigate]);
 
   // Handle Google OAuth callback
   useEffect(() => {
@@ -69,7 +83,7 @@ function AppContent() {
                 dateOfBirth = data.user.dateOfBirth.split('T')[0];
               }
             }
-            
+
             login({
               id: data.user.id,
               name: data.user.name,
@@ -85,17 +99,19 @@ function AppContent() {
                 sleep: 8
               }
             }, token);
-            
+
             // Remove token from URL
             window.history.replaceState({}, document.title, window.location.pathname);
-            
+
             // Check if profile is complete and navigate accordingly
             if (!data.user.phone || !data.user.dateOfBirth) {
               // Profile incomplete, navigate to complete-profile
-              window.location.href = '/complete-profile';
+              // We use a small timeout to let the state settle, and we'll use a custom event
+              // since we are outside the router's context here (or at the root)
+              window.dispatchEvent(new CustomEvent('auth-redirect', { detail: '/complete-profile?step=register' }));
             } else {
               // Profile complete, navigate to dashboard
-              window.location.href = '/dashboard';
+              window.dispatchEvent(new CustomEvent('auth-redirect', { detail: '/dashboard' }));
             }
           }
         })
@@ -126,7 +142,7 @@ function AppContent() {
           className="text-center"
         >
           <div className="w-24 h-24 bg-white rounded-3xl flex items-center justify-center mb-6 mx-auto">
-            <img src='/Square-icon.jpg'/>
+            <img src='/Square-icon.jpg' />
           </div>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -167,7 +183,7 @@ function AppContent() {
             } />
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
-        ) : !onboardingCompleted ? (
+        ) : !onboardingCompleted && location.pathname !== '/complete-profile' ? (
           <motion.div
             key="onboarding"
             initial={{ opacity: 0, scale: 0.9 }}
